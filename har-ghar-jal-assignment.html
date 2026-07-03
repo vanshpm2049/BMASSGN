@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Har Ghar Jal — Policy Design Assignment</title>
+<style>
+  :root{
+    --paper:#F7F4EC;
+    --ink:#152524;
+    --well:#1F5C63;
+    --well-deep:#0F3438;
+    --marigold:#E29A1E;
+    --clay:#B75C3D;
+    --line:rgba(21,37,36,0.14);
+    --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+3:wght@400;500;600;700&display=swap');
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Source Sans 3', sans-serif;
+    line-height:1.6;
+  }
+
+  /* ---------- texture ---------- */
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(31,92,99,0.05) 40px);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  .wrap{position:relative; z-index:1; max-width:920px; margin:0 auto; padding:0 32px 120px;}
+
+  /* ---------- header / masthead ---------- */
+  header.masthead{
+    padding:64px 0 40px;
+    border-bottom:3px solid var(--ink);
+    margin-bottom:8px;
+  }
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:12.5px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--well);
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:22px;
+  }
+  h1.title{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(38px, 6vw, 62px);
+    line-height:1.03;
+    letter-spacing:-0.01em;
+    margin:0 0 14px;
+    color:var(--well-deep);
+  }
+  h1.title em{
+    font-style:italic;
+    font-weight:400;
+    color:var(--marigold);
+  }
+  .subtitle{
+    font-size:18px;
+    max-width:640px;
+    color:rgba(21,37,36,0.75);
+    margin:0 0 26px;
+  }
+  .meta-row{
+    display:flex; flex-wrap:wrap; gap:28px;
+    font-family:var(--mono);
+    font-size:12.5px;
+    color:rgba(21,37,36,0.6);
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+  }
+  .meta-row span b{color:var(--ink); font-weight:600;}
+
+  /* ---------- brief / context card ---------- */
+  .brief{
+    margin:36px 0 56px;
+    padding:26px 28px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-left:4px solid var(--well);
+    font-size:16px;
+  }
+  .brief p{margin:0;}
+  .brief a{color:var(--well); }
+
+  /* ---------- gauge signature element ---------- */
+  .gauge-section{
+    display:grid;
+    grid-template-columns:200px 1fr;
+    gap:36px;
+    align-items:center;
+    margin:0 0 60px;
+    padding:28px;
+    background:var(--well-deep);
+    color:var(--paper);
+    position:relative;
+    overflow:hidden;
+  }
+  .gauge-section::after{
+    content:"";
+    position:absolute; right:-40px; top:-40px;
+    width:200px; height:200px;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(226,154,30,0.18), transparent 70%);
+  }
+  .tap-figure{width:200px; height:200px; position:relative; z-index:1;}
+  .gauge-copy{position:relative; z-index:1;}
+  .gauge-copy .num{
+    font-family:'Fraunces', serif;
+    font-size:15px;
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+    color:var(--marigold);
+    margin-bottom:6px;
+  }
+  .gauge-copy h2{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:26px;
+    margin:0 0 10px;
+    line-height:1.2;
+  }
+  .gauge-copy p{
+    margin:0;
+    font-size:15px;
+    color:rgba(247,244,236,0.82);
+    max-width:52ch;
+  }
+  .gap-tag{
+    display:inline-block;
+    margin-top:14px;
+    font-family:var(--mono);
+    font-size:12px;
+    padding:4px 10px;
+    border:1px solid rgba(226,154,30,0.6);
+    color:var(--marigold);
+    letter-spacing:0.04em;
+  }
+
+  /* ---------- section blocks ---------- */
+  section.block{
+    margin:0 0 54px;
+    scroll-margin-top:24px;
+  }
+  .block-head{
+    display:flex;
+    align-items:baseline;
+    gap:16px;
+    margin-bottom:20px;
+    padding-bottom:12px;
+    border-bottom:1px solid var(--line);
+  }
+  .block-num{
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--clay);
+    letter-spacing:0.08em;
+  }
+  .block-head h2{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:26px;
+    margin:0;
+    color:var(--well-deep);
+  }
+
+  .grid-2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+  }
+  @media (max-width:720px){
+    .grid-2{grid-template-columns:1fr;}
+    .gauge-section{grid-template-columns:1fr; text-align:left;}
+    .tap-figure{margin:0 auto;}
+  }
+
+  .card{
+    background:#fff;
+    border:1px solid var(--line);
+    padding:20px 22px;
+  }
+  .card h3{
+    font-family:'Source Sans 3', sans-serif;
+    font-weight:700;
+    font-size:14px;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:var(--well);
+    margin:0 0 10px;
+  }
+  .card ul{margin:0; padding-left:18px;}
+  .card li{margin-bottom:8px; font-size:15.5px;}
+  .card li:last-child{margin-bottom:0;}
+  .card li b{color:var(--ink);}
+
+  .full-card{
+    background:#fff;
+    border:1px solid var(--line);
+    padding:22px 24px;
+    font-size:15.5px;
+  }
+  .full-card ul{margin:0; padding-left:18px;}
+  .full-card li{margin-bottom:9px;}
+
+  .open-q{
+    margin-top:16px;
+    padding:14px 16px;
+    background:#FBF0DC;
+    border-left:3px solid var(--marigold);
+    font-size:14.5px;
+    font-style:italic;
+    color:#5C4318;
+  }
+  .open-q b{
+    font-style:normal;
+    font-family:var(--mono);
+    text-transform:uppercase;
+    font-size:11.5px;
+    letter-spacing:0.06em;
+    display:block;
+    margin-bottom:4px;
+    color:var(--clay);
+  }
+
+  /* outcomes bars */
+  .metric-row{
+    display:flex; align-items:center; gap:14px;
+    margin-bottom:16px;
+  }
+  .metric-row:last-child{margin-bottom:0;}
+  .metric-label{width:190px; font-size:14px; flex-shrink:0;}
+  .metric-track{
+    flex:1; height:10px; background:rgba(31,92,99,0.12); position:relative;
+  }
+  .metric-fill{height:100%; background:var(--well);}
+  .metric-fill.gap{background:var(--marigold);}
+  .metric-val{font-family:var(--mono); font-size:13px; width:48px; text-align:right; flex-shrink:0;}
+
+  /* throughline / conclusion */
+  .throughline{
+    margin-top:64px;
+    padding:40px 36px;
+    background:var(--well-deep);
+    color:var(--paper);
+    position:relative;
+  }
+  .throughline .eyebrow2{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--marigold);
+    margin-bottom:14px;
+  }
+  .throughline h2{
+    font-family:'Fraunces', serif;
+    font-size:28px;
+    font-weight:600;
+    margin:0 0 16px;
+    line-height:1.25;
+  }
+  .throughline p{
+    font-size:16px;
+    color:rgba(247,244,236,0.86);
+    max-width:68ch;
+    margin:0 0 12px;
+  }
+  .throughline p:last-child{margin-bottom:0;}
+
+  footer{
+    margin-top:56px;
+    padding-top:22px;
+    border-top:1px solid var(--line);
+    font-family:var(--mono);
+    font-size:12px;
+    color:rgba(21,37,36,0.5);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+
+  a.source{color:var(--well); text-decoration:none; border-bottom:1px dotted var(--well);}
+
+  /* ---------- nav dots ---------- */
+  .railnav{
+    position:fixed;
+    right:26px; top:50%; transform:translateY(-50%);
+    display:flex; flex-direction:column; gap:14px;
+    z-index:10;
+  }
+  .railnav a{
+    width:9px; height:9px; border-radius:50%;
+    background:rgba(31,92,99,0.22);
+    display:block;
+    position:relative;
+    transition:background 0.2s;
+  }
+  .railnav a:hover, .railnav a.active{background:var(--marigold);}
+  .railnav a span{
+    position:absolute; right:20px; top:50%; transform:translateY(-50%);
+    font-family:var(--mono); font-size:11px; white-space:nowrap;
+    background:var(--ink); color:var(--paper);
+    padding:3px 8px; border-radius:2px;
+    opacity:0; pointer-events:none; transition:opacity 0.15s;
+  }
+  .railnav a:hover span{opacity:1;}
+  @media (max-width:920px){.railnav{display:none;}}
+
+  /* ---------- states strip ---------- */
+  .states-strip{margin-top:18px; display:flex; flex-wrap:wrap; gap:8px;}
+  .state-pill{
+    font-family:var(--mono); font-size:12px;
+    padding:5px 10px;
+    border:1px solid var(--line);
+    background:#fff;
+  }
+  .state-pill.lead{border-color:var(--well); color:var(--well); font-weight:600;}
+  .state-pill.lag{border-color:var(--clay); color:var(--clay); font-weight:600;}
+
+  /* ---------- stat trio ---------- */
+  .stat-trio{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:20px;}
+  .stat-trio .stat{background:#fff; border:1px solid var(--line); padding:16px 18px;}
+  .stat-trio .stat .n{font-family:'Fraunces',serif; font-size:26px; font-weight:600; color:var(--well-deep);}
+  .stat-trio .stat .l{font-size:12.5px; color:rgba(21,37,36,0.6); margin-top:4px;}
+  @media (max-width:720px){.stat-trio{grid-template-columns:1fr;}}
+
+  /* ---------- card hover ---------- */
+  .card, .full-card{transition:box-shadow 0.2s, transform 0.2s;}
+  .card:hover, .full-card:hover{box-shadow:0 6px 18px rgba(15,52,56,0.08); transform:translateY(-2px);}
+
+  /* ---------- sources ---------- */
+  .sources-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:0;}
+  .sources-list li{
+    display:flex; justify-content:space-between; align-items:baseline; gap:16px;
+    padding:14px 0; border-bottom:1px solid var(--line);
+    font-size:15px;
+  }
+  .sources-list li:last-child{border-bottom:none;}
+  .sources-list .s-title{color:var(--ink); flex:1;}
+  .sources-list .s-tag{
+    font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.05em;
+    color:var(--well); flex-shrink:0;
+  }
+  .sources-list a{color:var(--well); text-decoration:none; border-bottom:1px solid rgba(31,92,99,0.35);}
+  .sources-list a:hover{border-bottom-color:var(--well);}
+
+  @media (prefers-reduced-motion: no-preference){
+    .metric-fill{transition:width 1.1s ease 0.15s; width:0 !important;}
+    .metric-fill.animate{width:var(--w) !important;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="railnav">
+  <a href="#stakeholders"><span>01 Stakeholders</span></a>
+  <a href="#targeting"><span>02 Targeting</span></a>
+  <a href="#financing"><span>03 Financing</span></a>
+  <a href="#outcomes"><span>04 Outcomes</span></a>
+  <a href="#reactions"><span>05 Reactions</span></a>
+  <a href="#sources"><span>06 Sources</span></a>
+</nav>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="eyebrow">
+      <span>Policy Design Assignment</span>
+      <span>Ministry of Jal Shakti · Government of India</span>
+    </div>
+    <h1 class="title">Har Ghar Jal <em>—</em><br>Every Household, A Tap</h1>
+    <p class="subtitle">A structured teardown of the Jal Jeevan Mission: who it moves, how it targets and pays, and where the gap between a connection and a functioning tap is quietly widening.</p>
+    <div class="meta-row">
+      <span>Scheme <b>Jal Jeevan Mission (JJM)</b></span>
+      <span>Launched <b>15 Aug 2019</b></span>
+      <span>Current phase <b>JJM 2.0, approved Mar 2026</b></span>
+      <span>Target <b>Tap water to every rural household by 2028</b></span>
+    </div>
+  </header>
+
+  <div class="brief">
+    <p><b>Assignment brief.</b> Har Ghar Jal ("water to every household") is the rural drinking-water initiative of the Jal Jeevan Mission, run by the central government to give every rural household a Functional Household Tap Connection (FHTC) delivering 55 litres per person per day. This assignment maps the scheme across five lenses — stakeholders, targeting and delivery, financing, outcomes, and societal reaction — and argues that the scheme's central tension is <b>coverage versus functionality</b>: a household can be "connected" on paper without water actually reaching the tap.</p>
+  </div>
+
+  <div class="gauge-section">
+    <svg class="tap-figure" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <!-- pipe -->
+      <rect x="86" y="10" width="28" height="50" fill="#2C6B72"/>
+      <rect x="70" y="52" width="60" height="16" rx="3" fill="#2C6B72"/>
+      <!-- tap spout -->
+      <path d="M130 60 h34 a10 10 0 0 1 10 10 v6 a10 10 0 0 1 -10 10 h-8 v10 h-14 v-10 h-12 z" fill="#3E8891"/>
+      <circle cx="118" cy="60" r="9" fill="#1B4B4F"/>
+      <!-- water drop path from spout -->
+      <g>
+        <path d="M158 96 q-4 14 0 24 q4 8 12 8 q8 0 12 -8 q4 -10 0 -24 q-6 8 -12 8 q-6 0 -12 -8 z" fill="var(--marigold)" opacity="0.95"/>
+      </g>
+      <!-- gauge ring: 81.6% coverage -->
+      <circle cx="100" cy="150" r="42" fill="none" stroke="rgba(247,244,236,0.18)" stroke-width="10"/>
+      <circle cx="100" cy="150" r="42" fill="none" stroke="var(--marigold)" stroke-width="10"
+        stroke-dasharray="264" stroke-dashoffset="49" stroke-linecap="round" transform="rotate(-90 100 150)"/>
+      <text x="100" y="146" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="22" fill="#F7F4EC" font-weight="600">82%</text>
+      <text x="100" y="162" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="rgba(247,244,236,0.7)" letter-spacing="1">CONNECTED</text>
+    </svg>
+    <div class="gauge-copy">
+      <div class="num">The number that matters</div>
+      <h2>15.80 crore households now have a tap — but not all of them have water.</h2>
+      <p>Coverage has climbed from 17% (3.23 crore households) in 2019 to roughly 81.6% by mid-2026. A 2024 government-commissioned survey found that while nearly 98% of rural households have a physical connection, only about three-fourths receive regular, safe, adequate supply. That last gap is the real target.</p>
+      <span class="gap-tag">Installed ≠ Functioning</span>
+    </div>
+  </div>
+
+  <!-- 01 STAKEHOLDERS -->
+  <section class="block" id="stakeholders">
+    <div class="block-head">
+      <span class="block-num">01</span>
+      <h2>Stakeholders &amp; Incentives</h2>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Ministers &amp; Departments</h3>
+        <ul>
+          <li><b>Jal Shakti Ministry</b> — owns credit for the flagship scheme</li>
+          <li><b>Finance Ministry</b> — carries the fiscal burden of the ₹8.69 lakh crore outlay</li>
+          <li><b>Chief Ministers / state governments</b> — political win, sharpened in states on a 50:50 cost split</li>
+          <li><b>PHED / PWD / state water boards</b> — implementation on the ground</li>
+          <li><b>Panchayati Raj &amp; Rural Development</b> — coordination layer</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Frontline &amp; Beneficiaries</h3>
+        <ul>
+          <li><b>Village Water &amp; Sanitation Committees (VWSC)</b> — operations &amp; maintenance, tariff collection, mandated 50% women members</li>
+          <li><b>Plumbers &amp; contractors</b> — installation</li>
+          <li><b>Women's SHGs</b> — water-quality testing via Field Test Kits</li>
+          <li><b>Rural households, women &amp; girls, children</b> — time saved, health, drudgery reduction, school/anganwadi access</li>
+        </ul>
+      </div>
+    </div>
+    <div class="open-q"><b>Watch</b> Households in water-scarce or arsenic/fluoride-contaminated regions, remote and tribal hamlets, and villages that are "certified" but not actually flowing sit outside the incentive structure that rewards certification over service.</div>
+  </section>
+
+  <!-- 02 TARGETING -->
+  <section class="block" id="targeting">
+    <div class="block-head">
+      <span class="block-num">02</span>
+      <h2>Targeting &amp; Delivery Mechanism</h2>
+    </div>
+    <div class="full-card">
+      <ul>
+        <li><b>Eligibility</b> — universal, no income or category test; every rural household in Gram Panchayat areas. Urban India is excluded, covered instead under AMRUT 2.0.</li>
+        <li><b>Registration</b> — application through the Gram Panchayat or VWSC, tracked with an application ID on the jaljeevanmission.gov.in portal.</li>
+        <li><b>Delivery mix</b> — piped tap water only, never cash or vouchers. Cost-sharing runs 100:0 (Centre:UT), 90:10 (North-East/Himalayan states), and 50:50 for other states.</li>
+        <li><b>Verification</b> — Field Test Kits for local water-quality checks, plus "Har Ghar Jal" village certification. But certification is infrastructure-based, and the 2024 functionality survey found it doesn't reliably predict actual supply.</li>
+      </ul>
+      <div class="open-q"><b>Design question</b> Should certification require a functionality audit — water actually flowing weekly — rather than just confirming a tap is installed?</div>
+    </div>
+  </section>
+
+  <!-- 03 FINANCING -->
+  <section class="block" id="financing">
+    <div class="block-head">
+      <span class="block-num">03</span>
+      <h2>Financing &amp; Sustainability</h2>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h3>The money</h3>
+        <ul>
+          <li>Total outlay: <b>₹8.69 lakh crore</b> under JJM 2.0</li>
+          <li>Central share: <b>₹3.59 lakh crore</b>, states covering the balance per the sharing ratio</li>
+          <li>Recent disbursement: <b>₹1,561 crore</b> released in April 2026 to five states, including <b>₹792.93 crore</b> to Uttar Pradesh</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Built-in sustainability</h3>
+        <ul>
+          <li>Mandatory grey-water management via soak pits</li>
+          <li>Rainwater harvesting and groundwater recharge designed in from the start</li>
+          <li>Structural pivot in JJM 2.0: from an <b>infrastructure-centric</b> model to <b>utility-based service delivery</b> — paying for reliability, not just pipe-laying</li>
+        </ul>
+      </div>
+    </div>
+    <div class="open-q"><b>Open question</b> Is there a tariff or user-fee model funding long-term O&amp;M, or does the scheme stay centrally subsidised indefinitely?</div>
+  </section>
+
+  <!-- 04 OUTCOMES -->
+  <section class="block" id="outcomes">
+    <div class="block-head">
+      <span class="block-num">04</span>
+      <h2>Outcomes to Measure</h2>
+    </div>
+    <div class="full-card">
+      <div class="metric-row">
+        <div class="metric-label">Coverage (has FHTC)</div>
+        <div class="metric-track"><div class="metric-fill" style="--w:82%"></div></div>
+        <div class="metric-val">~82%</div>
+      </div>
+      <div class="metric-row">
+        <div class="metric-label">Functionality (weekly water)</div>
+        <div class="metric-track"><div class="metric-fill gap" style="--w:75%"></div></div>
+        <div class="metric-val">~75%</div>
+      </div>
+      <p style="margin:18px 0 0; font-size:14.5px; color:rgba(21,37,36,0.65);">State variance is wide: 11 states and Union Territories — including Goa, Telangana, Haryana, Punjab, Gujarat, Himachal Pradesh, and Puducherry — have reached 100% coverage, while 8 states remain below 80%. Beyond the headline numbers, the assignment should track: reduction in waterborne disease and time saved (translating into school attendance and women's labour-force participation); arsenic and fluoride levels from community testing; and whether excluded or remote groups are closing the gap, not just national averages.</p>
+
+      <div class="states-strip">
+        <span class="state-pill lead">Goa · 100%</span>
+        <span class="state-pill lead">Telangana · 100%</span>
+        <span class="state-pill lead">Haryana · 100%</span>
+        <span class="state-pill lead">Punjab · 100%</span>
+        <span class="state-pill lead">Gujarat · 100%</span>
+        <span class="state-pill lag">8 states · &lt;80%</span>
+        <span class="state-pill lag">incl. UP, Bihar, Rajasthan, Jharkhand</span>
+      </div>
+
+      <div class="stat-trio">
+        <div class="stat">
+          <div class="n">5.5 cr</div>
+          <div class="l">hours saved daily, mostly for women, once fetching water is no longer needed — WHO estimate</div>
+        </div>
+        <div class="stat">
+          <div class="n">~4 lakh</div>
+          <div class="l">diarrhoeal deaths projected to be prevented annually through safe water access — WHO estimate</div>
+        </div>
+        <div class="stat">
+          <div class="n">2,868</div>
+          <div class="l">water-testing labs now operating nationwide, 1,704 of them NABL-accredited (as of Jan 2026)</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 SOCIETAL REACTIONS -->
+  <section class="block" id="reactions">
+    <div class="block-head">
+      <span class="block-num">05</span>
+      <h2>Societal Reactions &amp; Impacts to Anticipate</h2>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Political &amp; governance friction</h3>
+        <ul>
+          <li>Opposition-ruled states may contest funding allocation or credit-claiming</li>
+          <li>The scheme is tied to the PM's 2019 Independence Day announcement, keeping it politically salient</li>
+          <li>VWSCs often lack the technical capacity to fix source or pump failures — RTI filings are already a common citizen recourse when a tap is installed but dry</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Risk &amp; scrutiny</h3>
+        <ul>
+          <li>Fraud/leakage risk from inflated "certified village" counts that don't reflect real functionality</li>
+          <li>The gap between official coverage (~98%) and functionality survey data (~75%) is likely to draw "installation over service" criticism</li>
+          <li>Unintended consequence to watch: over-extraction of groundwater in water-stressed regions if recharge isn't implemented alongside new connections</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 SOURCES -->
+  <section class="block" id="sources">
+    <div class="block-head">
+      <span class="block-num">06</span>
+      <h2>Sources &amp; Further Reading</h2>
+    </div>
+    <div class="full-card">
+      <ul class="sources-list">
+        <li>
+          <span class="s-title">Official Jal Jeevan Mission dashboard — live coverage data by state, district, and village</span>
+          <a class="s-tag" href="https://ejalshakti.gov.in/jjmreport/JJMIndia.aspx" target="_blank" rel="noopener">jjm dashboard →</a>
+        </li>
+        <li>
+          <span class="s-title">Ministry of Jal Shakti press release on JJM progress, testing labs, and Union Budget 2025–26 extension to 2028</span>
+          <a class="s-tag" href="https://www.pib.gov.in/PressReleasePage.aspx?PRID=2222149" target="_blank" rel="noopener">PIB, Feb 2026 →</a>
+        </li>
+        <li>
+          <span class="s-title">Ministry of Jal Shakti press release on FHTC milestones, WHO and IIM-Bangalore/ILO impact estimates</span>
+          <a class="s-tag" href="https://www.pib.gov.in/PressReleasePage.aspx?PRID=2098651" target="_blank" rel="noopener">PIB release →</a>
+        </li>
+        <li>
+          <span class="s-title">Background, cost-sharing ratios, and JJM 2.0 approval details</span>
+          <a class="s-tag" href="https://en.wikipedia.org/wiki/Jal_Jeevan_Mission" target="_blank" rel="noopener">Wikipedia →</a>
+        </li>
+        <li>
+          <span class="s-title">JJM 2.0 extension to December 2028, revised outlay, and shift to service-delivery model</span>
+          <a class="s-tag" href="https://www.drishtiias.com/state-pcs-current-affairs/jal-jeevan-mission-2-extension-and-restructuring" target="_blank" rel="noopener">Drishti IAS →</a>
+        </li>
+        <li>
+          <span class="s-title">ICRA analysis on the O&amp;M opportunity created by JJM 2.0's shift toward service delivery, and state-wise coverage variance</span>
+          <a class="s-tag" href="https://www.tribuneindia.com/news/business/jal-jeevan-mission-2-0-set-to-unlock-rs-3-lakh-crore-om-opportunity-for-epc-sector-icra/amp" target="_blank" rel="noopener">The Tribune →</a>
+        </li>
+        <li>
+          <span class="s-title">Digital governance tools (Jal Mitra, RPWSS module), functionality assessments, and community water-security case studies</span>
+          <a class="s-tag" href="https://www.shankariasparliament.com/current-affairs/jal-jeevan-mission-jjm-1" target="_blank" rel="noopener">Shankar IAS →</a>
+        </li>
+      </ul>
+      <p style="margin:18px 0 0; font-size:13.5px; color:rgba(21,37,36,0.55);">Note: the coverage-vs-functionality gap figure (~75% receiving regular, safe, adequate supply against ~98% "connected") reflects an independent 2024 government-commissioned household survey referenced across current-affairs coverage of JJM; consult the official dashboard above for the latest village-level functionality data before citing this figure in formal submissions.</p>
+    </div>
+  </section>
+
+  <div class="throughline">
+    <div class="eyebrow2">Throughline</div>
+    <h2>Design promised a connection. Delivery has to promise water.</h2>
+    <p>Every lens above lands on the same fault line: JJM was built and funded to lay pipe, and it has done that at genuine scale — from 17% to 82% coverage in six years. But a scheme measured by taps installed will always outrun a scheme measured by water delivered, unless the incentive structure — certification, financing, and O&amp;M — is rebuilt around functionality rather than infrastructure.</p>
+    <p>For the mind map: put this gap, not the coverage number, at the centre. It's the "pilot and iterate" note the assignment is asking for — JJM 2.0's shift toward "utility-based service delivery" is the government's own acknowledgment that the first version optimised the wrong metric.</p>
+  </div>
+
+  <footer>
+    <span>Prepared for coursework use</span>
+    <span>Live tracking: <a class="source" href="https://ejalshakti.gov.in/jjmreport/JJMIndia.aspx" target="_blank" rel="noopener">ejalshakti.gov.in</a> · full citations in Section 06</span>
+  </footer>
+
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const fills = document.querySelectorAll('.metric-fill');
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('animate'); } });
+    }, {threshold:0.3});
+    fills.forEach(f => obs.observe(f));
+
+    // scroll-spy for the rail nav
+    const navLinks = document.querySelectorAll('.railnav a');
+    const targets = Array.from(navLinks).map(a => document.querySelector(a.getAttribute('href')));
+    const spy = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting){
+          const id = '#' + entry.target.id;
+          navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === id));
+        }
+      });
+    }, {rootMargin:'-45% 0px -45% 0px'});
+    targets.forEach(t => { if(t) spy.observe(t); });
+  });
+</script>
+
+</body>
+</html>
